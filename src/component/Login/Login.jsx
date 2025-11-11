@@ -59,6 +59,7 @@ const Login = () => {
           signInWithGoogle()
           .then(result =>{
               console.log(result.user)
+              navigate(location ?.state || "/")
           })
           .catch(error => {
             console.log(error)
@@ -111,7 +112,7 @@ const Login = () => {
 
             {error && <p className="text-red-400 text-xs">{error}</p>}
 
-            <button type="submit" className="btn btn-neutral mt-4">
+            <button type="submit" className="button btn btn-neutral mt-4">
               Login
             </button>
             {/* Google */}

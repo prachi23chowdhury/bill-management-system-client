@@ -8,16 +8,6 @@ import { AuthContext } from '../../context/AuthContext';
 
 const Register = () => {
 
-  const {signInWithGoogle} = use(AuthContext)
-   const handleGoogleSignIn = () =>{
-        signInWithGoogle()
-        .then(result =>{
-            console.log(result.user)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-   }
   const [nameError, setNameError] =useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -74,12 +64,42 @@ const Register = () => {
   });
     }
 
-
-
   const handleTogglePasswordShow = (event) =>{
     event.preventDefault();
     setShowPassword(!showPassword)
   }
+
+  const {signInWithGoogle} = use(AuthContext);
+    const handleGoogleSignIn = () =>{
+        signInWithGoogle()
+        .then(result =>{
+            console.log(result.user)
+            navigate(location ?.state || "/")
+            const newUser = {
+                name : result.user.displayName,
+                email : result.user.email,
+                image : result.user.photoURL,
+            }
+
+
+            // create user in the database
+            fetch("http://localhost:3000/users",{
+                method: "POST",
+                headers: {
+                    "content-type":"application/json"
+                },
+                body: JSON.stringify(newUser)
+            })
+            .then(res => res.json())
+            .then(data =>{
+                console.log("data after user save", data)
+            })
+        })
+        .catch(error=>{
+            console.log(error)
+        })
+    }
+  
     return (
         <div>
              <div className='flex justify-center min-h-screen items-center'>
