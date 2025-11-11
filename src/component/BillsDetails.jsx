@@ -37,19 +37,44 @@ export default function BillDetails() {
   if (!bill) return <div className="p-6 text-center">Bill not found!</div>;
 
   return (
-    <section className="max-w-3xl mx-auto p-6 bg-white shadow rounded mt-6">
-      <h1 className="text-2xl font-bold mb-4">{bill.title || 'Untitled Bill'}</h1>
-      <p className="mb-2"><strong>Category:</strong> {bill.category || '—'}</p>
-      <p className="mb-2"><strong>Location:</strong> {bill.location || '—'}</p>
-      <p className="mb-2"><strong>Description:</strong> {bill.description || 'No description provided'}</p>
-      <p className="mb-2"><strong>Amount:</strong> ৳{bill.amount ?? '—'}</p>
-      <p className="mb-4"><strong>Date:</strong> {bill.date ? new Date(bill.date).toLocaleDateString() : '—'}</p>
+    <section className="pt-24 max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6 border border-gray-200">
+      {/* Header */}
+      <div className="bg-blue-600 text-white p-4 rounded-t-lg mb-4">
+        <h1 className="text-2xl font-bold">{bill.title || 'Untitled Bill'}</h1>
+        <p className="text-sm opacity-80">
+          {bill.date ? new Date(bill.date).toLocaleDateString() : 'No Date'}
+        </p>
+      </div>
+
+      {/* Details */}
+      <div className="space-y-3">
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Category:</span>
+          <span>{bill.category || '—'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Location:</span>
+          <span>{bill.location || '—'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Amount:</span>
+          <span className="text-green-600 font-medium">৳{bill.amount ?? '—'}</span>
+        </div>
+        <div>
+          <span className="font-semibold text-gray-700">Description:</span>
+          <p className="mt-1 text-gray-600">{bill.description || 'No description provided'}</p>
+        </div>
+      </div>
+
+      {/* Image */}
       {bill.image && (
-        <img
-          src={bill.image}
-          alt={bill.title || 'Bill Image'}
-          className="w-full max-w-md rounded shadow"
-        />
+        <div className="mt-6 flex justify-center">
+          <img
+            src={bill.image}
+            alt={bill.title || 'Bill Image'}
+            className="w-full max-w-md rounded shadow-md"
+          />
+        </div>
       )}
     </section>
   );
