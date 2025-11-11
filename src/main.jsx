@@ -12,6 +12,7 @@ import AuthProvider from './context/AuthProvider';
 import Register from './component/Register/Register';
 import Login from './component/Login/Login';
 import { IoClose } from 'react-icons/io5';
+import BillDetails from './component/BillsDetails';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         Component: Login
+      },
+      {
+        path: "/bills/:id",
+        Component: BillDetails
       },
        {
     path: "*",

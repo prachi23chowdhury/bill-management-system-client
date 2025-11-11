@@ -15,7 +15,7 @@ export default function RecentBillsPage(){
 
   useEffect(()=>{
     let mounted = true;
-    fetch('http://localhost:3000/recent-bills') // <-- changed to recent-bills
+    fetch('http://localhost:3000/recent-bills') 
       .then(res => res.json())
       .then(data => { 
         if(mounted){ 
@@ -52,7 +52,7 @@ export default function RecentBillsPage(){
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <div className="text-sm text-gray-600">Amount: <span className="font-medium">{b.Amount ?? '—'}</span></div>
+              <div className="text-sm text-gray-600">Amount: <span className="font-medium">{b.amount ?? '—'}</span></div>
               <Link to={`/bills/${b._id}`}>
                 <button className="px-3 py-1 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 text-sm">See Details</button>
               </Link>
