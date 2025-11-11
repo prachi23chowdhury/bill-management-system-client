@@ -14,7 +14,7 @@ const Navbar = () => {
       .catch(() => {});
   };
 
-  // helper to get the best available profile picture
+
   const profileImage =
     user?.photoURL || user?.providerData?.[0]?.photoURL || "https://i.ibb.co/0yP2NQy/default-user.png";
 
