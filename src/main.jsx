@@ -8,6 +8,10 @@ import { RouterProvider } from "react-router/dom";
 import Home from './component/Home/Home';
 import AllBills from './component/AllBills/AllBills';
 import RootLayout from './layout/RootLayout';
+import AuthProvider from './context/AuthProvider';
+import Register from './component/Register/Register';
+import Login from './component/Login/Login';
+import { IoClose } from 'react-icons/io5';
 
 const router = createBrowserRouter([
   {
@@ -22,7 +26,26 @@ const router = createBrowserRouter([
       {
         path:"alBills",
         Component: AllBills
-      }
+      },
+      {
+        path: "register",
+        Component: Register
+      },
+      {
+        path: "login",
+        Component: Login
+      },
+       {
+    path: "*",
+    element: (
+      <div className=" flex items-center justify-center min-h-screen bg-gradient-to-r from-red-100 via-pink-100 to-orange-100">
+       <IoClose className="text-6xl text-red-500  mb-3 animate-bounce" />
+          <h2 className="text-3xl font-extrabold text-red-600 mb-2">
+            Error 404 - Page Not Found
+          </h2>
+      </div>
+    ),
+  }
       
     ]
   },
@@ -31,7 +54,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
 
   </StrictMode>,
 )

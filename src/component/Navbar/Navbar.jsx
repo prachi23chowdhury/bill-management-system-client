@@ -1,159 +1,152 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
+import { FaBars, FaTimes, FaUser } from "react-icons/fa";
+// NOTE: in typical React apps use 'react-router-dom' for Link — if you are using react-router v6+ use:
+import { Link } from "react-router"; // keep if your project uses this; otherwise change to 'react-router-dom'
+import { AuthContext } from "../../context/AuthContext";
 
-export default function NavbarBeforeAfterLogin({ initialLoggedIn = false, user = null }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(initialLoggedIn);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, signOutUser } = useContext(AuthContext);
 
-  const handleLogin = () => setIsLoggedIn(true);
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setProfileOpen(false);
+  const handleSignOut = () => {
+    signOutUser()
+      .then(() => {})
+      .catch(() => {});
   };
 
-  const NavLink = ({ href = '#', children }) => (
-    <a
-      href={href}
-      className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100"
-      onClick={() => setMobileOpen(false)}
-    >
-      {children}
-    </a>
-  );
+  // helper to get the best available profile picture
+  const profileImage =
+    user?.photoURL || user?.providerData?.[0]?.photoURL || "https://i.ibb.co/0yP2NQy/default-user.png";
 
   return (
-    <header className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Left: Logo */}
-          <div className="flex items-center">
-            <a href="#" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">BP</div>
-              <span className="font-semibold text-lg">PayWise Bill</span>
-            </a>
-          </div>
+    <nav className="bg-white shadow-md fixed w-full top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
+        {/* Left: Logo */}
+        <div className="flex-shrink-0">
+          <Link to="/" className="text-2xl font-bold text-blue-600 flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">BP</div>
+            <span className="hidden sm:inline">PayWise Bill</span>
+          </Link>
+        </div>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-4">
-            <NavLink href="#">Home</NavLink>
-            <NavLink href="#">Bills</NavLink>
+        {/* Center: Menu */}
+        <div className="flex-1 flex justify-center">
+          <ul className="hidden md:flex space-x-6 font-medium items-center">
+            <li><Link to="/" className="hover:text-blue-500">Home</Link></li>
+            <li><Link to="/bills" className="hover:text-blue-500">Bills</Link></li>
 
-            {!isLoggedIn ? (
-              <>
-                <a
-                  href="/login"
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-                >
-                  Login
-                </a>
-                <a
-                  href="/register"
-                  className="px-4 py-2 text-sm font-medium border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50"
-                >
-                  Register
-                </a>
-              </>
-            ) : (
-              <>
-                <NavLink href="#">My Pay Bills</NavLink>
+            {/* ADDED: Add Bill link */}
+            <li><Link to="/add-bill" className="hover:text-blue-500">Add Bill</Link></li>
 
-                {/* Profile avatar + dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setProfileOpen((s) => !s)}
-                    className="flex items-center gap-2 focus:outline-none"
-                    aria-haspopup="true"
-                    aria-expanded={profileOpen}
-                  >
-                    <img
-                      src={user?.avatar || 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff'}
-                      alt="avatar"
-                      className="w-8 h-8 rounded-full"
-                    />
-                  </button>
-
-                  {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1 z-20">
-                      <a href="#" className="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
-                      <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
-                    </div>
-                  )}
-                </div>
-              </>
+            {user && (
+              <li><Link to="/mypaybills" className="hover:text-blue-500">My Pay Bills</Link></li>
             )}
-          </nav>
+            <li><Link to="/about" className="hover:text-blue-500">About</Link></li>
+          </ul>
+        </div>
 
-          {/* Right: mobile menu button and small-screen actions */}
-          <div className="flex items-center md:hidden">
-            {!isLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <a
-                  href="/login"
-                  className="px-3 py-1 rounded-md text-sm bg-indigo-600 text-white"
+        {/* Right: User / Login */}
+        <div className="flex-shrink-0 relative flex items-center gap-3">
+          {user ? (
+            <div className="group inline-block relative">
+              <img
+                src={profileImage}
+                alt={user.displayName || "User"}
+                className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-400"
+              />
+              {/* Dropdown (shows on hover) */}
+              <div className="absolute right-0 hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 w-44">
+                <Link to="/profile" className="block px-4 py-2 hover:bg-blue-50">Profile</Link>
+                <Link to="/add-bill" className="block px-4 py-2 hover:bg-blue-50">Add Bill</Link>
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                 >
-                  Login
-                </a>
-                <a
-                  href="/register"
-                  className="px-3 py-1 rounded-md text-sm border border-indigo-600 text-indigo-600"
-                >
-                  Register
-                </a>
-                <button onClick={() => setMobileOpen((s) => !s)} className="p-2 rounded-md focus:outline-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                  Logout
                 </button>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button onClick={() => setProfileOpen((s) => !s)} className="p-1 rounded-full focus:outline-none">
-                  <img
-                    src={user?.avatar || 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff'}
-                    alt="avatar"
-                    className="w-8 h-8 rounded-full"
-                  />
-                </button>
+            </div>
+          ) : (
+            <div className="flex gap-2 items-center">
+              <Link
+                to="/login"
+                className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
+              >
+                <FaUser /> <span className="hidden sm:inline">Login</span>
+              </Link>
+              <Link
+                to="/register"
+                className="border border-blue-500 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 flex items-center gap-2"
+              >
+                Register
+              </Link>
+            </div>
+          )}
 
-                <button onClick={() => setMobileOpen((s) => !s)} className="p-2 rounded-md focus:outline-none">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                </button>
-
-                {profileOpen && (
-                  <div className="absolute right-4 top-16 w-40 bg-white border rounded-md shadow-lg py-1 z-20">
-                    <a href="#" className="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
-                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">Logout</button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-2xl text-blue-600 ml-2"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu panel */}
-      {mobileOpen && (
-        <div className="md:hidden border-t">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            <NavLink href="#">Home</NavLink>
-            <NavLink href="#">Bills</NavLink>
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-white shadow-md">
+          <ul className="flex flex-col items-center space-y-3 py-4 font-medium">
+            <li><Link to="/" onClick={() => setMenuOpen(false)} className="w-full text-center">Home</Link></li>
+            <li><Link to="/bills" onClick={() => setMenuOpen(false)} className="w-full text-center">Bills</Link></li>
 
-            {!isLoggedIn ? (
-              <>
-                <a href="/login" className="block px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Login</a>
-                <a href="/register" className="block px-3 py-2 rounded-md text-sm font-medium border border-indigo-600 text-indigo-600 hover:bg-indigo-50">Register</a>
-              </>
-            ) : (
-              <>
-                <NavLink href="#">My Pay Bills</NavLink>
-                <a href="#" onClick={handleLogout} className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100">Logout</a>
-              </>
+            {/* ADDED: mobile Add Bill link */}
+            <li><Link to="/add-bill" onClick={() => setMenuOpen(false)} className="w-full text-center">Add Bill</Link></li>
+
+            {user && (
+              <li><Link to="/mypaybills" onClick={() => setMenuOpen(false)} className="w-full text-center">My Pay Bills</Link></li>
             )}
-          </div>
+            <li><Link to="/about" onClick={() => setMenuOpen(false)} className="w-full text-center">About</Link></li>
+
+            <div className="w-full border-t mt-2 pt-3 flex flex-col items-center">
+              {user ? (
+                <>
+                  <Link to="/profile" onClick={() => setMenuOpen(false)} className="w-40 text-center">Profile</Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setMenuOpen(false);
+                    }}
+                    className="w-40 text-center text-red-600 mt-2"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg w-40 text-center"
+                  >
+                    <div className="flex items-center justify-center gap-2"><FaUser /> Login</div>
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMenuOpen(false)}
+                    className="border border-blue-500 text-blue-600 px-4 py-2 rounded-lg w-40 text-center mt-2"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </ul>
         </div>
       )}
-    </header>
+    </nav>
   );
-}
+};
+
+export default Navbar;
