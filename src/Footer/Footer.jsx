@@ -7,7 +7,7 @@ const Footer = () => {
 
         {/* Logo & Site Name */}
         <div>
-          <h2 className="text-2xl font-bold text-white"> PayWise Bill0</h2>
+          <h2 className="text-2xl font-bold text-white"> PayWise Bill</h2>
           <p className="mt-2 text-sm">
             Simplify your billing experience — track, pay, and manage bills effortlessly.
           </p>
