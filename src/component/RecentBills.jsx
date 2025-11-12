@@ -9,6 +9,7 @@ function formatDate(iso){
 }
 
 export default function RecentBillsPage(){
+  
   const [bills, setBills] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -37,7 +38,7 @@ export default function RecentBillsPage(){
 
   return (
     <section className="max-w-6xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Recent Bills</h2>
+      <h2 className="text-3xl font-bold mb-4  text-blue-600 ">Recent Bills</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {bills.map(b => (
           <motion.article key={b._id} whileHover={{scale:1.02}} className="bg-white border rounded-lg p-4 shadow-sm">

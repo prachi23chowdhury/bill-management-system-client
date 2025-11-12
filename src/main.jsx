@@ -14,6 +14,8 @@ import Login from './component/Login/Login';
 import { IoClose } from 'react-icons/io5';
 import BillDetails from './component/BillsDetails';
 import BillsPage from './component/BillPages';
+import PayBill from './component/PayBill';
+
 
 const router = createBrowserRouter([
   {
@@ -45,6 +47,11 @@ const router = createBrowserRouter([
         path: "/bills",
         Component: BillsPage
       },
+      {
+        path: "paybill", 
+        Component: PayBill
+      },
+     
        {
     path: "*",
     element: (

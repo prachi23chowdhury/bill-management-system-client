@@ -58,7 +58,7 @@ const Banner = ({ className = '' }) => {
                   transition={{ duration: 0.6 }}
                   className="absolute inset-0"
                 >
-                  {/* Use <img> for better control with imported assets + object-fit */}
+                  
                   <img
                     src={slide.image}
                     alt={slide.title}
@@ -66,10 +66,10 @@ const Banner = ({ className = '' }) => {
                     aria-hidden="true"
                   />
 
-                  {/* stronger overlay for contrast */}
+              
                   <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
 
-                  {/* Content: use a semi-opaque glass panel so text is always legible */}
+               
                   <div className="relative z-10 h-full flex items-center">
                     <div className="px-6 sm:px-12 md:px-16 max-w-2xl">
                       <div className="bg-black/40 backdrop-blur-sm rounded-lg p-4 sm:p-6 md:p-8 shadow-lg">

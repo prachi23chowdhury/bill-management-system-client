@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import useDocumentTitle from '../useDocomentTitle';
+import { Link } from 'react-router';
 
 export default function BillsPage() {
-  const [allBills, setAllBills] = useState([]); // sob bills
-  const [displayBills, setDisplayBills] = useState([]); // show bills
+    useDocumentTitle('Bills | MyApp'); 
+  const [allBills, setAllBills] = useState([]);
+  const [displayBills, setDisplayBills] = useState([]); 
   const categories = ['All', 'Electricity', 'Gas', 'Water', 'Internet'];
 
   useEffect(() => {
@@ -14,7 +17,7 @@ export default function BillsPage() {
     try {
       const res = await axios.get('http://localhost:3000/bills');
       setAllBills(res.data);
-      setDisplayBills(res.data); // initially sob dekhabe
+      setDisplayBills(res.data); 
     } catch (err) {
       console.error(err);
     }
@@ -22,10 +25,10 @@ export default function BillsPage() {
 
   const handleCategoryClick = (category) => {
     if (category === 'All') {
-      setDisplayBills(allBills); // sob dekhao
+      setDisplayBills(allBills); 
     } else {
       const filtered = allBills.filter(bill => bill.category === category);
-      setDisplayBills(filtered); // sudhu oi category
+      setDisplayBills(filtered); 
     }
   };
 
@@ -54,12 +57,14 @@ export default function BillsPage() {
             <h2 className="font-bold text-lg">{bill.title}</h2>
             <p className="text-sm text-gray-600">{bill.category} | {bill.location}</p>
             <p className="text-md font-semibold mt-1">Amount: ${bill.amount}</p>
+
+            <Link to={`/bills/${bill._id}`}>
             <button
-              className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={() => window.location.href = `/bills/${bill._id}`}
-            >
+              className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
               See Details
             </button>
+            </Link>
+            
           </div>
         ))}
       </div>

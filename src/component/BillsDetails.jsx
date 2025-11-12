@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams, Navigate } from 'react-router';
+import { useParams, Navigate, Link } from 'react-router';
 import { AuthContext } from '../context/AuthContext';
+import PayBill from './PayBill';
+
 
 export default function BillDetails() {
   const { user } = useContext(AuthContext); 
@@ -9,10 +11,7 @@ export default function BillDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Redirect to login if not logged in
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
+  if (!user) return <Navigate to="/login" />;
 
   useEffect(() => {
     async function fetchBill() {
@@ -36,17 +35,21 @@ export default function BillDetails() {
   if (error) return <div className="p-6 text-center text-red-600">{error}</div>;
   if (!bill) return <div className="p-6 text-center">Bill not found!</div>;
 
+  // Check if bill date is in current month
+  const isCurrentMonth = (() => {
+    if (!bill.date) return false;
+    const billDate = new Date(bill.date);
+    const now = new Date();
+    return billDate.getFullYear() === now.getFullYear() && billDate.getMonth() === now.getMonth();
+  })();
+
   return (
     <section className="pt-24 max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6 border border-gray-200">
-      {/* Header */}
       <div className="bg-blue-600 text-white p-4 rounded-t-lg mb-4">
         <h1 className="text-2xl font-bold">{bill.title || 'Untitled Bill'}</h1>
-        <p className="text-sm opacity-80">
-          {bill.date ? new Date(bill.date).toLocaleDateString() : 'No Date'}
-        </p>
+        <p className="text-sm opacity-80">{bill.date ? new Date(bill.date).toLocaleDateString() : 'No Date'}</p>
       </div>
 
-      {/* Details */}
       <div className="space-y-3">
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Category:</span>
@@ -66,16 +69,30 @@ export default function BillDetails() {
         </div>
       </div>
 
-      {/* Image */}
       {bill.image && (
         <div className="mt-6 flex justify-center">
-          <img
-            src={bill.image}
-            alt={bill.title || 'Bill Image'}
-            className="w-full max-w-md rounded shadow-md"
-          />
+          <img src={bill.image} alt={bill.title || 'Bill Image'} className="w-full max-w-md rounded shadow-md" />
         </div>
       )}
+
+      <div className="mt-6 flex flex-col gap-3">
+        {/* PayBill Button (only enabled for current month bills) */}
+        {isCurrentMonth ? (
+          <PayBill bill={bill} />
+        ) : (
+          <button disabled className="px-4 py-2 bg-gray-400 text-white rounded cursor-not-allowed">
+            Pay Bill
+          </button>
+        )}
+        {!isCurrentMonth && (
+          <p className="text-xs text-red-600">Only current-month bills can be paid.</p>
+        )}
+
+        {/* Back button */}
+        <Link to="/">
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Back</button>
+        </Link>
+      </div>
     </section>
   );
 }

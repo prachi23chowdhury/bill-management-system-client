@@ -4,10 +4,11 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
+import useDocumentTitle from '../../useDocomentTitle';
 
 
 const Register = () => {
-
+useDocumentTitle('Register | MyApp'); 
   const [nameError, setNameError] =useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

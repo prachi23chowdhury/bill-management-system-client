@@ -6,12 +6,14 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase/firebase.init';
+import useDocumentTitle from '../../useDocomentTitle';
 
 
 
 
 
 const Login = () => {
+  useDocumentTitle('Login | MyApp'); 
   const [error, setError] = useState("");
   const emailRef = useRef();
    const [showPassword, setShowPassword] = useState(false);
