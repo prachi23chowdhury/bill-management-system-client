@@ -1,4 +1,4 @@
-// src/pages/Profile.jsx
+
 import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import useDocumentTitle from '../useDocomentTitle';

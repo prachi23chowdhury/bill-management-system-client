@@ -117,7 +117,7 @@ const Register = () => {
       const u = result?.user;
       if (!u) throw new Error('Google sign-in returned no user');
 
-      // save social user to DB (do not wait navigation until save completes)
+      
       const newUser = {
         name: u.displayName || 'No Name',
         email: u.email,
@@ -140,7 +140,7 @@ const Register = () => {
         console.error('Failed to save google user (network):', saveErr);
       }
 
-      // set auth user in context then navigate
+      
       setUser && setUser(u);
       toast.success('Signed in with Google');
       navigate(redirectTo);
@@ -178,7 +178,7 @@ const Register = () => {
                   placeholder="Password"
                   required
                 />
-                {/* important: type="button" so it doesn't submit the form */}
+             
                 <button type="button" onClick={handleTogglePasswordShow} className="btn btn-xs absolute top-2 right-5">
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
@@ -195,7 +195,7 @@ const Register = () => {
                 className="btn bg-white text-black border-[#e5e5e5] mt-3"
                 disabled={submitting}
               >
-                {/* you can add an svg icon here */}
+               
                 Login with Google
               </button>
 

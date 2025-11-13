@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="bg-gray-900 text-gray-300 py-8 mt-10">
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
 
-        {/* Logo & Site Name */}
+        {/* Site Name */}
         <div>
           <h2 className="text-2xl font-bold text-white">PayWise Bill</h2>
           <p className="mt-2 text-sm">

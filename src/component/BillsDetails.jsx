@@ -37,7 +37,7 @@ export default function BillDetails() {
   if (error) return <div className="p-6 text-center text-red-600">{error}</div>;
   if (!bill) return <div className="p-6 text-center">Bill not found!</div>;
 
-  // Check if bill date is in current month
+ 
   const isCurrentMonth = (() => {
     if (!bill.date) return false;
     const billDate = new Date(bill.date);
@@ -78,7 +78,7 @@ export default function BillDetails() {
       )}
 
       <div className="mt-6 flex flex-col gap-3">
-        {/* PayBill Button (only enabled for current month bills) */}
+    
         {isCurrentMonth ? (
           <PayBill bill={bill} />
         ) : (
@@ -92,7 +92,7 @@ export default function BillDetails() {
 
         {/* Back button */}
         <Link to="/">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Back</button>
+          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full">Back</button>
         </Link>
       </div>
     </section>

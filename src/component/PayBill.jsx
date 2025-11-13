@@ -33,7 +33,7 @@ export default function PayBill({ bill }) {
         amount: bill.amount || "",
         category: bill.category || "",
         title: bill.title || "",
-        image: bill.image || "", // <-- auto-fill image
+        image: bill.image || "", 
         username: "",
         location: "",
         phone: "",
@@ -88,7 +88,7 @@ export default function PayBill({ bill }) {
               </div>
             )}
 
-            {/* Display Bill Image */}
+            {/*  Image */}
             {formData.image && (
               <div className="mb-4 flex justify-center">
                 <img
@@ -100,7 +100,7 @@ export default function PayBill({ bill }) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* Auto-filled read-only fields */}
+              {/* read-only  */}
               <input type="email" name="email" value={formData.email} readOnly className="w-full border px-3 py-2 rounded bg-gray-100" />
               <input type="text" name="billId" value={formData.billId} readOnly className="w-full border px-3 py-2 rounded bg-gray-100" />
               <input type="number" name="amount" value={formData.amount} readOnly className="w-full border px-3 py-2 rounded bg-gray-100" />

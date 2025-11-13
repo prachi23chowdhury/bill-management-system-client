@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
-import { DownloadReport } from "./DownloadReport";
 import useDocumentTitle from "../useDocomentTitle";
+
+
+import jsPDF from "jspdf";
+
+import "jspdf-autotable"
+
+
 
 export default function MyPayBills() {
    useDocumentTitle('My Pay Bills | MyApp'); 
@@ -32,7 +38,7 @@ export default function MyPayBills() {
     }
   }, [user]);
 
-  // ✅ Handle update modal
+  
   const handleUpdateClick = (bill) => {
     setSelectedBill(bill);
     setUpdateData({
@@ -44,14 +50,14 @@ export default function MyPayBills() {
     setShowUpdateModal(true);
   };
 
-  // ✅ Handle update submit
+  
   const handleUpdateSubmit = async () => {
     await axios.patch(`http://localhost:3000/bills/${selectedBill._id}`, updateData);
     setShowUpdateModal(false);
     window.location.reload();
   };
 
-  // ✅ Handle delete
+  
   const handleDeleteClick = (bill) => {
     setSelectedBill(bill);
     setShowDeleteModal(true);
@@ -63,7 +69,34 @@ export default function MyPayBills() {
     window.location.reload();
   };
 
+
+
+const exportToPDF = ()=>{
+   const doc = new jsPDF()
+
+   doc.text('Data Export',20, 10)
+
+   const tableColumn = ["Username", "Email", "Amount", "Address", "Phone", "Date"];
+  const tableRows = bills.map((bill) => [
+    bill.username,
+    bill.email,
+    bill.amount,
+    bill.address,
+    bill.phone,
+    bill.date,
+  ]);
+
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableRows,
   
+  });
+  doc.save("data pdf")
+
+  
+
+ }
+
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -75,12 +108,13 @@ export default function MyPayBills() {
       </div>
 
       <div className="flex justify-end mb-3">
-  <button
-    onClick={DownloadReport}
-    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-  >
-    Download Report
+<div className="flex justify-end mb-3">
+  
+  <button onClick={exportToPDF}
+className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">   Export to PDF
   </button>
+</div>
+
 </div>
 
       <table className="w-full bg-white shadow rounded">

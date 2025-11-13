@@ -107,7 +107,7 @@ const Banner = ({ className = '' }) => {
             ))}
           </AnimatePresence>
 
-          {/* Controls */}
+         
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
             <button onClick={prev} aria-label="Previous" className="p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60">
               <FaChevronLeft />
@@ -119,7 +119,7 @@ const Banner = ({ className = '' }) => {
             </button>
           </div>
 
-          {/* Indicators */}
+          
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
             {slides.map((_, i) => (
               <button

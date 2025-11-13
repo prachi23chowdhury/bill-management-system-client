@@ -6,7 +6,7 @@ export default function About() {
      useDocumentTitle('About| MyApp'); 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-24">
-      {/* Header Section */}
+      {/* Heade Section */}
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -23,7 +23,7 @@ export default function About() {
         </p>
       </motion.div>
 
-      {/* Features Section */}
+     
       <div className="grid md:grid-cols-3 gap-8 w-full max-w-6xl">
         {[
           {
@@ -57,7 +57,7 @@ export default function About() {
         ))}
       </div>
 
-      {/* Footer / Call to Action */}
+     
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}

@@ -33,14 +33,14 @@ const Navbar = () => {
           <ul className="hidden md:flex space-x-6 font-medium items-center">
             <li><Link to="/" className="hover:text-blue-500">Home</Link></li>
             <li><Link to="/bills" className="hover:text-blue-500">Bills</Link></li>
-            <li><Link to="/add-bill" className="hover:text-blue-500">Add Bill</Link></li>
+            <li><Link to="/addbill" className="hover:text-blue-500">Add Bill</Link></li>
             {user && <li><Link to="/mypaybills" className="hover:text-blue-500">My Pay Bills</Link></li>}
             {user && <li><Link to="/profile" className="hover:text-blue-500">Profile</Link></li>}
             <li><Link to="/about" className="hover:text-blue-500">About</Link></li>
           </ul>
         </div>
 
-        {/* Right: User / Login */}
+       {/* login */}
         <div className="flex-shrink-0 relative flex items-center gap-3">
           {user ? (
             <div className="group inline-block relative">
