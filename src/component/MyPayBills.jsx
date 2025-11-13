@@ -3,10 +3,11 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import useDocumentTitle from "../useDocomentTitle";
 
-
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
-import "jspdf-autotable"
+
+
 
 
 
@@ -29,7 +30,7 @@ export default function MyPayBills() {
   useEffect(() => {
     if (user?.email) {
       axios
-        .get(`http://localhost:3000/my-bills?email=${user.email}`)
+        .get(`https://bill-managment-system-api-server.vercel.app/my-bills?email=${user.email}`)
         .then((res) => {
           setBills(res.data.bills);
           setTotalBillPaid(res.data.totalBillPaid);
@@ -52,7 +53,7 @@ export default function MyPayBills() {
 
   
   const handleUpdateSubmit = async () => {
-    await axios.patch(`http://localhost:3000/bills/${selectedBill._id}`, updateData);
+    await axios.patch(`https://bill-managment-system-api-server.vercel.app/bills/${selectedBill._id}`, updateData);
     setShowUpdateModal(false);
     window.location.reload();
   };
@@ -64,19 +65,19 @@ export default function MyPayBills() {
   };
 
   const confirmDelete = async () => {
-    await axios.delete(`http://localhost:3000/bills/${selectedBill._id}`);
+    await axios.delete(`https://bill-managment-system-api-server.vercel.app/bills/${selectedBill._id}`);
     setShowDeleteModal(false);
     window.location.reload();
   };
 
 
 
-const exportToPDF = ()=>{
-   const doc = new jsPDF()
+const exportToPDF = () => {
+  const doc = new jsPDF();
 
-   doc.text('Data Export',20, 10)
+  doc.text("My Bills Report", 20, 10);
 
-   const tableColumn = ["Username", "Email", "Amount", "Address", "Phone", "Date"];
+  const tableColumn = ["Username", "Email", "Amount", "Address", "Phone", "Date"];
   const tableRows = bills.map((bill) => [
     bill.username,
     bill.email,
@@ -86,16 +87,15 @@ const exportToPDF = ()=>{
     bill.date,
   ]);
 
-  doc.autoTable({
+  // Use autoTable correctly
+  autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
-  
+    startY: 20, // optional, start below the title
   });
-  doc.save("data pdf")
 
-  
-
- }
+  doc.save("my_bills.pdf");
+};
 
 
   return (
@@ -104,7 +104,7 @@ const exportToPDF = ()=>{
 
       <div className="flex justify-center gap-10 mb-4">
         <p className="font-semibold">Total Bills Paid: {totalBillPaid}</p>
-        <p className="font-semibold">Total Amount: ৳{totalAmount}</p>
+        <p className="font-semibold">Total Amount: {totalAmount}</p>
       </div>
 
       <div className="flex justify-end mb-3">
@@ -134,7 +134,7 @@ className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">   Export
             <tr key={bill._id} className="border-t text-center">
               <td className="p-2">{bill.username}</td>
               <td className="p-2">{bill.email}</td>
-              <td className="p-2">৳{bill.amount}</td>
+              <td className="p-2">{bill.amount}</td>
               <td className="p-2">{bill.address}</td>
               <td className="p-2">{bill.phone}</td>
               <td className="p-2">{bill.date}</td>

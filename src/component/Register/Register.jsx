@@ -1,213 +1,175 @@
-// src/components/auth/Register.jsx
-import React, { useContext, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { AuthContext } from '../../context/AuthContext';
-import useDocumentTitle from '../../useDocomentTitle';
+import { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router";
+import { toast, ToastContainer } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { AuthContext } from "../../context/AuthContext";
 
 
 const Register = () => {
-  useDocumentTitle('Register | MyApp');
-
-  const [nameError, setNameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const { createUser, setUser, updateUser, signInWithGoogle } = useContext(AuthContext);
-
-  const location = useLocation();
+  const [nameError, setNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
-  const redirectTo = location?.state?.from?.pathname || '/';
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (submitting) return;
-    setSubmitting(true);
+  const { createUser, updateUser, setUser, signInWithGoogle } = useContext(AuthContext);
 
+  //  Google Login
+  const handleGoogleSignIn = async () => {
     try {
-      const form = e.target;
-      const name = form.name.value.trim();
-      const photo = form.photo.value.trim();
-      const email = form.email.value.trim();
-      const password = form.password.value;
+      const result = await signInWithGoogle();
+      const user = result.user;
+      console.log(" Google Sign-in user:", user);
 
-      if (name.length < 5) {
-        setNameError('Name should be more than 5 characters');
-        setSubmitting(false);
-        return;
-      } else {
-        setNameError('');
-      }
-
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-      if (!passwordRegex.test(password)) {
-        setPasswordError('Password must have at least 6 characters, including uppercase & lowercase letters.');
-        toast.error('Invalid password format!');
-        setSubmitting(false);
-        return;
-      } else {
-        setPasswordError('');
-      }
-
-      
-      const result = await createUser(email, password);
-      const user = result?.user;
-      if (!user) throw new Error('User creation returned no user');
-
-
-      try {
-        await updateUser({ displayName: name, photoURL: photo || null });
-       
-        setUser && setUser({ ...user, displayName: name, photoURL: photo || null });
-      } catch (updateErr) {
-        console.error('updateUser error:', updateErr);
-      
-        setUser && setUser(user);
-      }
-
-      
       const newUser = {
-        name,
-        email,
-        image: photo || null,
-        provider: 'email'
+        name: user.displayName,
+        email: user.email,
+        image: user.photoURL,
       };
 
-      const res = await fetch('http://localhost:3000/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser)
+      const res = await fetch("https://bill-managment-system-api-server.vercel.app/users", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(newUser),
       });
 
-   
-      if (!res.ok) {
-        const text = await res.text().catch(() => null);
-        console.error('Server returned non-OK for /users:', res.status, text);
-        toast.warn('Registered but failed to save user in DB.');
-      
-        navigate(redirectTo);
-        return;
-      }
-
       const data = await res.json();
-      // console.log('user saved to DB:', data);
-      toast.success('Registration successful!');
-      navigate(redirectTo);
+      console.log(" Google user saved to DB:", data);
+      toast.success("Google login successful!");
+      navigate("/");
     } catch (error) {
-      console.error('createUser/register error:', error);
-      toast.error(error?.message || 'Registration failed');
-    } finally {
-      setSubmitting(false);
+      console.error(" Google Sign-in error:", error);
+      toast.error("Google Sign-in failed!");
     }
   };
 
-  const handleTogglePasswordShow = (event) => {
-    event.preventDefault();
-    setShowPassword((s) => !s);
-  };
+  //  clicking button Register
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const name = form.name.value;
+    const photo = form.photo.value;
+    const email = form.email.value;
+    const password = form.password.value;
+    const confirmPassword = form.confirmPassword.value;
 
-  const handleGoogleSignIn = async () => {
-    if (submitting) return;
-    setSubmitting(true);
+    console.log(" Submitting Register form:", { name, email });
+
+    // Validation
+    if (name.length < 5) {
+      setNameError("Name must be at least 5 characters");
+      return;
+    } else setNameError("");
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+      return;
+    }
+
+    const regex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+    if (!regex.test(password)) {
+      setPasswordError("Password must have uppercase & lowercase letters.");
+      return;
+    } else setPasswordError("");
+
     try {
-      const result = await signInWithGoogle();
-      const u = result?.user;
-      if (!u) throw new Error('Google sign-in returned no user');
+      console.log(" Creating Firebase user...");
+      const result = await createUser(email, password);
+      console.log(" Firebase user created:", result.user);
 
-      
-      const newUser = {
-        name: u.displayName || 'No Name',
-        email: u.email,
-        image: u.photoURL || null,
-        provider: 'google'
-      };
+      await updateUser({ displayName: name, photoURL: photo });
+      console.log("Profile updated");
 
-      try {
-        const res = await fetch('http://localhost:3000/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newUser)
-        });
-        if (!res.ok) {
-          console.error('Failed to save google user:', res.status, await res.text().catch(()=>null));
-        } else {
-          console.log('google user saved', await res.json());
-        }
-      } catch (saveErr) {
-        console.error('Failed to save google user (network):', saveErr);
-      }
+      const newUser = { name, email, image: photo };
+      console.log(" Sending to MongoDB:", newUser);
 
-      
-      setUser && setUser(u);
-      toast.success('Signed in with Google');
-      navigate(redirectTo);
-    } catch (error) {
-      console.error('Google sign-in error:', error);
-      toast.error('Google sign-in failed');
-    } finally {
-      setSubmitting(false);
+      const res = await fetch("https://bill-managment-system-api-server.vercel.app/users", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      const data = await res.json();
+      console.log(" MongoDB response:", data);
+
+      setUser({ ...result.user, displayName: name, photoURL: photo });
+      toast.success("Account created successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error(" Error during register:", err);
+      toast.error(err.code || "Registration failed");
     }
   };
 
   return (
-    <div>
-      <div className="flex justify-center min-h-screen items-center">
-        <form onSubmit={handleRegister} className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl py-5">
-          <h2 className="font-semibold text-2xl text-center">Register your account</h2>
-          <div className="card-body">
-            <fieldset className="fieldset">
-              <label className="label">Your Name </label>
-              <input name="name" type="text" className="input" placeholder="Enter your name" required />
-              {nameError && <p className="text-xs text-error">{nameError}</p>}
+    <div className="flex justify-center min-h-screen items-center">
+      <div className="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl py-5">
+        <h2 className="font-semibold text-2xl text-center">Register your account</h2>
 
-              <label className="label">Photo URL </label>
-              <input name="photo" type="text" className="input" placeholder="Photo URL" />
+        <form onSubmit={handleRegister} className="card-body">
+          <fieldset className="fieldset">
+            <label className="label">Your Name</label>
+            <input name="name" type="text" className="input" placeholder="Enter your name" required />
+            {nameError && <p className="text-xs text-error">{nameError}</p>}
 
-              <label className="label">Email </label>
-              <input name="email" type="email" className="input" placeholder="Enter your email address" required />
+            <label className="label">Photo URL</label>
+            <input name="photo" type="text" className="input" placeholder="Photo URL" />
 
-              <label className="label">Password</label>
-              <div className="relative">
-                <input
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  className="input"
-                  placeholder="Password"
-                  required
-                />
-             
-                <button type="button" onClick={handleTogglePasswordShow} className="btn btn-xs absolute top-2 right-5">
-                  {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </button>
-                {passwordError && <p className="text-xs text-error">{passwordError}</p>}
-              </div>
+            <label className="label">Email</label>
+            <input name="email" type="email" className="input" placeholder="Enter your email" required />
 
-              <button type="submit" className="button btn btn-neutral mt-4" disabled={submitting}>
-                {submitting ? 'Please wait...' : 'Register'}
-              </button>
-
+            <label className="label">Password</label>
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                className="input"
+                placeholder="Password"
+                required
+              />
               <button
                 type="button"
-                onClick={handleGoogleSignIn}
-                className="btn bg-white text-black border-[#e5e5e5] mt-3"
-                disabled={submitting}
+                onClick={() => setShowPassword(!showPassword)}
+                className="btn btn-xs absolute top-2 right-5"
               >
-               
-                Login with Google
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
+            </div>
 
-              <p className="font-semibold text-center pt-5">
-                Already Have An Account ?{' '}
-                <Link to="/login" className="text-secondary">Login</Link>
-              </p>
-            </fieldset>
-          </div>
+            <label className="label">Confirm Password</label>
+            <div className="relative">
+              <input
+                name="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                className="input"
+                placeholder="Confirm Password"
+                required
+              />
+            </div>
+
+            {passwordError && <p className="text-xs text-error">{passwordError}</p>}
+
+            <button type="submit" className="btn gradient-btn btn-neutral mt-4">
+              Register
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="btn gradient-btn bg-white text-black border-[#e5e5e5]"
+            >
+              Continue with Google
+            </button>
+
+            <p className="font-semibold text-center pt-5">
+              Already have an account?{" "}
+              <Link to="/login" className="text-secondary">
+                Login
+              </Link>
+            </p>
+          </fieldset>
         </form>
       </div>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-center" />
     </div>
   );
 };

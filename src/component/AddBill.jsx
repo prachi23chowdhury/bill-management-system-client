@@ -17,7 +17,7 @@ export default function AddBill(){
 
   useEffect(()=>{
     let mounted = true;
-    fetch('http://localhost:3000/add-bills') 
+    fetch('https://bill-managment-system-api-server.vercel.app/add-bills') 
       .then(res => res.json())
       .then(data => { 
         if(mounted){ 

@@ -16,7 +16,7 @@ export default function RecentBillsPage(){
 
   useEffect(()=>{
     let mounted = true;
-    fetch('http://localhost:3000/recent-bills') 
+    fetch('https://bill-managment-system-api-server.vercel.app/recent-bills') 
       .then(res => res.json())
       .then(data => { 
         if(mounted){ 

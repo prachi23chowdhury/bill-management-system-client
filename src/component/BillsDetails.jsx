@@ -18,7 +18,7 @@ export default function BillDetails() {
   useEffect(() => {
     async function fetchBill() {
       try {
-        const res = await fetch(`http://localhost:3000/bills/${id}`);
+        const res = await fetch(`https://bill-managment-system-api-server.vercel.app/${id}`);
         if (!res.ok) throw new Error('Bill not found');
         const data = await res.json();
         setBill(data);

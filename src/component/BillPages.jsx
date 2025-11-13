@@ -15,7 +15,7 @@ export default function BillsPage() {
 
   const fetchBills = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/bills');
+      const res = await axios.get('https://bill-managment-system-api-server.vercel.app/bills');
       setAllBills(res.data);
       setDisplayBills(res.data); 
     } catch (err) {
