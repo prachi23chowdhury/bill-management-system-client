@@ -5,154 +5,118 @@ import { AuthContext } from "../context/AuthContext";
 export default function MyPayBills() {
   const { user } = useContext(AuthContext);
   const [bills, setBills] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // Modals
+  const [totalBillPaid, setTotalBillPaid] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [selectedBill, setSelectedBill] = useState(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [updateData, setUpdateData] = useState({});
+  const [updateData, setUpdateData] = useState({
+    amount: "",
+    address: "",
+    phone: "",
+    date: ""
+  });
 
-  // Fetch bills
   useEffect(() => {
-    if (!user) return;
-    fetchBills();
+    if (user?.email) {
+      axios
+        .get(`http://localhost:3000/my-bills?email=${user.email}`)
+        .then((res) => {
+          setBills(res.data.bills);
+          setTotalBillPaid(res.data.totalBillPaid);
+          setTotalAmount(res.data.totalAmount);
+        });
+    }
   }, [user]);
 
-  const fetchBills = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`http://localhost:3000/payments?email=${user.email}`);
-      setBills(res.data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to fetch bills");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Total Amount
-  const totalAmount = bills.reduce((sum, b) => sum + Number(b.amount || 0), 0);
-
-  // CSV Download
-  const downloadCSV = () => {
-    const headers = ["Username", "Email", "Amount", "Address", "Phone", "Date"];
-    const rows = bills.map(b => [
-      b.username,
-      b.email,
-      b.amount,
-      b.address,
-      b.phone,
-      new Date(b.date).toLocaleDateString()
-    ]);
-    let csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `my_bills_${new Date().toISOString()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // Open Update Modal
-  const openUpdateModal = (bill) => {
+  // ✅ Handle update modal
+  const handleUpdateClick = (bill) => {
     setSelectedBill(bill);
     setUpdateData({
       amount: bill.amount,
       address: bill.address,
       phone: bill.phone,
-      date: new Date(bill.date).toISOString().split("T")[0],
+      date: bill.date,
     });
     setShowUpdateModal(true);
   };
 
-  const handleUpdateChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateData(prev => ({ ...prev, [name]: value }));
-  };
-
+  // ✅ Handle update submit
   const handleUpdateSubmit = async () => {
-    try {
-      console.log("Updating bill:", selectedBill._id, updateData); // debug
-      await axios.put(`http://localhost:3000/payments/${selectedBill._id}`, updateData);
-      setShowUpdateModal(false);
-      fetchBills();
-    } catch (err) {
-      console.error(err);
-    }
+    await axios.patch(`http://localhost:3000/bills/${selectedBill._id}`, updateData);
+    setShowUpdateModal(false);
+    window.location.reload();
   };
 
-  // Open Delete Modal
-  const openDeleteModal = (bill) => {
+  // ✅ Handle delete
+  const handleDeleteClick = (bill) => {
     setSelectedBill(bill);
     setShowDeleteModal(true);
   };
 
-  const handleDelete = async () => {
-    try {
-      await axios.delete(`http://localhost:3000/payments/${selectedBill._id}`);
-      setShowDeleteModal(false);
-      fetchBills();
-    } catch (err) {
-      console.error(err);
-    }
+  const confirmDelete = async () => {
+    await axios.delete(`http://localhost:3000/bills/${selectedBill._id}`);
+    setShowDeleteModal(false);
+    window.location.reload();
   };
 
-  if (!user) return <p className="p-6 text-center">Please login to view your bills</p>;
-  if (loading) return <p className="p-6 text-center">Loading...</p>;
-  if (error) return <p className="p-6 text-center text-red-600">{error}</p>;
+  // ✅ Download report
+  const handleDownload = async () => {
+    const res = await axios.get(`http://localhost:3000/download-report/${user.email}`);
+    const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${user.email}-report.json`;
+    link.click();
+  };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">My Paid Bills</h2>
-        <button
-          onClick={downloadCSV}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Download Report
-        </button>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h1 className="text-2xl font-bold mb-4 text-center">My Pay Bills</h1>
+
+      <div className="flex justify-center gap-10 mb-4">
+        <p className="font-semibold">Total Bills Paid: {totalBillPaid}</p>
+        <p className="font-semibold">Total Amount: ৳{totalAmount}</p>
       </div>
 
-      <div className="mb-4">
-        <p>Total Bills Paid: {bills.length}</p>
-        <p>Total Amount: ৳{totalAmount}</p>
-      </div>
+      <button
+        onClick={handleDownload}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
+      >
+        Download Report
+      </button>
 
-      <table className="w-full table-auto border border-gray-200">
-        <thead className="bg-gray-100">
+      <table className="w-full bg-white shadow rounded">
+        <thead className="bg-gray-200">
           <tr>
-            <th className="border px-3 py-2">Username</th>
-            <th className="border px-3 py-2">Email</th>
-            <th className="border px-3 py-2">Amount</th>
-            <th className="border px-3 py-2">Address</th>
-            <th className="border px-3 py-2">Phone</th>
-            <th className="border px-3 py-2">Date</th>
-            <th className="border px-3 py-2">Actions</th>
+            <th className="p-2">Username</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Amount</th>
+            <th className="p-2">Address</th>
+            <th className="p-2">Phone</th>
+            <th className="p-2">Date</th>
+            <th className="p-2">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {bills.map(bill => (
-            <tr key={bill._id}>
-              <td className="border px-3 py-2">{bill.username}</td>
-              <td className="border px-3 py-2">{bill.email}</td>
-              <td className="border px-3 py-2">৳{bill.amount}</td>
-              <td className="border px-3 py-2">{bill.address}</td>
-              <td className="border px-3 py-2">{bill.phone}</td>
-              <td className="border px-3 py-2">{new Date(bill.date).toLocaleDateString()}</td>
-              <td className="border px-3 py-2 flex gap-2">
+          {bills.map((bill) => (
+            <tr key={bill._id} className="border-t text-center">
+              <td className="p-2">{bill.username}</td>
+              <td className="p-2">{bill.email}</td>
+              <td className="p-2">৳{bill.amount}</td>
+              <td className="p-2">{bill.address}</td>
+              <td className="p-2">{bill.phone}</td>
+              <td className="p-2">{bill.date}</td>
+              <td className="p-2">
                 <button
-                  onClick={() => openUpdateModal(bill)}
-                  className="px-2 py-1 bg-yellow-500 text-white rounded"
+                  onClick={() => handleUpdateClick(bill)}
+                  className="bg-yellow-400 text-white px-2 py-1 rounded mr-2"
                 >
                   Update
                 </button>
                 <button
-                  onClick={() => openDeleteModal(bill)}
-                  className="px-2 py-1 bg-red-500 text-white rounded"
+                  onClick={() => handleDeleteClick(bill)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
                 >
                   Delete
                 </button>
@@ -162,78 +126,61 @@ export default function MyPayBills() {
         </tbody>
       </table>
 
-      {/* Update Modal */}
+      {/* ✅ Update Modal */}
       {showUpdateModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg w-11/12 max-w-md p-6">
-            <h3 className="text-lg font-bold mb-4">Update Bill</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-xl mb-4">Update Bill</h2>
             <input
-              type="number"
-              name="amount"
+              type="text"
               value={updateData.amount}
-              onChange={handleUpdateChange}
+              onChange={(e) => setUpdateData({ ...updateData, amount: e.target.value })}
               placeholder="Amount"
-              className="w-full border px-3 py-2 rounded mb-2"
+              className="w-full border p-2 mb-2"
             />
             <input
               type="text"
-              name="address"
               value={updateData.address}
-              onChange={handleUpdateChange}
+              onChange={(e) => setUpdateData({ ...updateData, address: e.target.value })}
               placeholder="Address"
-              className="w-full border px-3 py-2 rounded mb-2"
+              className="w-full border p-2 mb-2"
             />
             <input
-              type="tel"
-              name="phone"
+              type="text"
               value={updateData.phone}
-              onChange={handleUpdateChange}
+              onChange={(e) => setUpdateData({ ...updateData, phone: e.target.value })}
               placeholder="Phone"
-              className="w-full border px-3 py-2 rounded mb-2"
+              className="w-full border p-2 mb-2"
             />
             <input
               type="date"
-              name="date"
               value={updateData.date}
-              onChange={handleUpdateChange}
-              className="w-full border px-3 py-2 rounded mb-2"
+              onChange={(e) => setUpdateData({ ...updateData, date: e.target.value })}
+              className="w-full border p-2 mb-4"
             />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setShowUpdateModal(false)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdateSubmit}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
+            <div className="flex justify-end gap-2">
+              <button onClick={handleUpdateSubmit} className="bg-green-500 text-white px-3 py-1 rounded">
                 Save
+              </button>
+              <button onClick={() => setShowUpdateModal(false)} className="bg-gray-400 text-white px-3 py-1 rounded">
+                Cancel
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete Modal */}
+      {/* ✅ Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg w-11/12 max-w-md p-6">
-            <h3 className="text-lg font-bold mb-4">Delete Confirmation</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded shadow-lg w-80 text-center">
             <p>Are you sure you want to delete this bill?</p>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
+            <div className="flex justify-center mt-4 gap-4">
+              <button onClick={confirmDelete} className="bg-red-500 text-white px-4 py-1 rounded">
                 Delete
+              </button>
+              <button onClick={() => setShowDeleteModal(false)} className="bg-gray-400 text-white px-4 py-1 rounded">
+                Cancel
               </button>
             </div>
           </div>

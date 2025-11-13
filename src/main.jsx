@@ -43,11 +43,6 @@ const router = createBrowserRouter([
         Component: Login
       },
       {
-        path: "addbill",
-        Component: AddBill
-      },
-
-      {
         path: "about",
         Component: About
       },
