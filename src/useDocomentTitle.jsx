@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const useDocumentTitle = (title) => {
     useEffect(() => {
-        document.title = title || 'MyApp'; // fallback title
+        document.title = title || 'MyApp'; 
     }, [title]);
 };
 

@@ -1,7 +1,7 @@
+// Navbar.jsx
 import React, { useState, useContext } from "react";
 import { FaBars, FaTimes, FaUser } from "react-icons/fa";
-// NOTE: in typical React apps use 'react-router-dom' for Link — if you are using react-router v6+ use:
-import { Link } from "react-router"; // keep if your project uses this; otherwise change to 'react-router-dom'
+import { Link } from "react-router"; 
 import { AuthContext } from "../../context/AuthContext";
 
 const Navbar = () => {
@@ -14,14 +14,13 @@ const Navbar = () => {
       .catch(() => {});
   };
 
-
   const profileImage =
     user?.photoURL || user?.providerData?.[0]?.photoURL || "https://i.ibb.co/0yP2NQy/default-user.png";
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 flex items-center h-16">
-        {/* Left: Logo */}
+        {/* Logo */}
         <div className="flex-shrink-0">
           <Link to="/" className="text-2xl font-bold text-blue-600 flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">BP</div>
@@ -29,18 +28,14 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Center: Menu */}
+        {/* Desktop Menu */}
         <div className="flex-1 flex justify-center">
           <ul className="hidden md:flex space-x-6 font-medium items-center">
             <li><Link to="/" className="hover:text-blue-500">Home</Link></li>
             <li><Link to="/bills" className="hover:text-blue-500">Bills</Link></li>
-
-            {/* ADDED: Add Bill link */}
             <li><Link to="/add-bill" className="hover:text-blue-500">Add Bill</Link></li>
-
-            {user && (
-              <li><Link to="/mypaybills" className="hover:text-blue-500">My Pay Bills</Link></li>
-            )}
+            {user && <li><Link to="/mypaybills" className="hover:text-blue-500">My Pay Bills</Link></li>}
+            {user && <li><Link to="/profile" className="hover:text-blue-500">Profile</Link></li>}
             <li><Link to="/about" className="hover:text-blue-500">About</Link></li>
           </ul>
         </div>
@@ -54,7 +49,7 @@ const Navbar = () => {
                 alt={user.displayName || "User"}
                 className="w-10 h-10 rounded-full cursor-pointer border-2 border-blue-400"
               />
-              {/* Dropdown (shows on hover) */}
+              {/* Dropdown */}
               <div className="absolute right-0 hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 w-44">
                 <Link to="/profile" className="block px-4 py-2 hover:bg-blue-50">Profile</Link>
                 <Link to="/add-bill" className="block px-4 py-2 hover:bg-blue-50">Add Bill</Link>
@@ -100,13 +95,9 @@ const Navbar = () => {
           <ul className="flex flex-col items-center space-y-3 py-4 font-medium">
             <li><Link to="/" onClick={() => setMenuOpen(false)} className="w-full text-center">Home</Link></li>
             <li><Link to="/bills" onClick={() => setMenuOpen(false)} className="w-full text-center">Bills</Link></li>
-
-            {/* ADDED: mobile Add Bill link */}
             <li><Link to="/add-bill" onClick={() => setMenuOpen(false)} className="w-full text-center">Add Bill</Link></li>
-
-            {user && (
-              <li><Link to="/mypaybills" onClick={() => setMenuOpen(false)} className="w-full text-center">My Pay Bills</Link></li>
-            )}
+            {user && <li><Link to="/mypaybills" onClick={() => setMenuOpen(false)} className="w-full text-center">My Pay Bills</Link></li>}
+            {user && <li><Link to="/profile" onClick={() => setMenuOpen(false)} className="w-full text-center">Profile</Link></li>}
             <li><Link to="/about" onClick={() => setMenuOpen(false)} className="w-full text-center">About</Link></li>
 
             <div className="w-full border-t mt-2 pt-3 flex flex-col items-center">

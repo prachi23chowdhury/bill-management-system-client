@@ -18,6 +18,7 @@ import PayBill from './component/PayBill';
 import MyPayBills from './component/MyPayBills';
 import About from './component/About';
 import AddBill from './component/AddBill';
+import Profile from './component/Profile';
 
 
 const router = createBrowserRouter([
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
      {
         path: "mypaybills", 
         Component: MyPayBills
+      },
+       {
+        path: "profile", 
+        Component: Profile
       },
        {
     path: "*",
