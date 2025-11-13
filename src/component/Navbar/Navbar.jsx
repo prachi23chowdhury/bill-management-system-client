@@ -52,7 +52,7 @@ const Navbar = () => {
               {/* Dropdown */}
               <div className="absolute right-0 hidden group-hover:block bg-white shadow-lg rounded-lg mt-2 w-44">
                 <Link to="/profile" className="block px-4 py-2 hover:bg-blue-50">Profile</Link>
-                <Link to="/add-bill" className="block px-4 py-2 hover:bg-blue-50">Add Bill</Link>
+                <Link to="/addbill" className="block px-4 py-2 hover:bg-blue-50">Add Bill</Link>
                 <button
                   onClick={handleSignOut}
                   className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
