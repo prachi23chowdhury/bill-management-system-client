@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { DownloadReport } from "./DownloadReport";
+import useDocumentTitle from "../useDocomentTitle";
 
 export default function MyPayBills() {
+   useDocumentTitle('My Pay Bills | MyApp'); 
   const { user } = useContext(AuthContext);
   const [bills, setBills] = useState([]);
   const [totalBillPaid, setTotalBillPaid] = useState(0);
@@ -60,15 +63,7 @@ export default function MyPayBills() {
     window.location.reload();
   };
 
-  // ✅ Download report
-  const handleDownload = async () => {
-    const res = await axios.get(`http://localhost:3000/download-report/${user.email}`);
-    const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${user.email}-report.json`;
-    link.click();
-  };
+  
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -79,12 +74,14 @@ export default function MyPayBills() {
         <p className="font-semibold">Total Amount: ৳{totalAmount}</p>
       </div>
 
-      <button
-        onClick={handleDownload}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
-      >
-        Download Report
-      </button>
+      <div className="flex justify-end mb-3">
+  <button
+    onClick={DownloadReport}
+    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+  >
+    Download Report
+  </button>
+</div>
 
       <table className="w-full bg-white shadow rounded">
         <thead className="bg-gray-200">
@@ -126,7 +123,7 @@ export default function MyPayBills() {
         </tbody>
       </table>
 
-      {/* ✅ Update Modal */}
+      {/* Update  */}
       {showUpdateModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -170,7 +167,7 @@ export default function MyPayBills() {
         </div>
       )}
 
-      {/* ✅ Delete Confirmation Modal */}
+      {/*  Delete  */}
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded shadow-lg w-80 text-center">

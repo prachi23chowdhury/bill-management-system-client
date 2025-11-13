@@ -52,23 +52,23 @@ const Register = () => {
         setPasswordError('');
       }
 
-      // create auth user
+      
       const result = await createUser(email, password);
       const user = result?.user;
       if (!user) throw new Error('User creation returned no user');
 
-      // update auth profile (await it)
+
       try {
         await updateUser({ displayName: name, photoURL: photo || null });
-        // update local context user if setUser exists
+       
         setUser && setUser({ ...user, displayName: name, photoURL: photo || null });
       } catch (updateErr) {
         console.error('updateUser error:', updateErr);
-        // still continue to save to DB and navigate (we keep auth user)
+      
         setUser && setUser(user);
       }
 
-      // prepare payload and save to backend
+      
       const newUser = {
         name,
         email,
@@ -82,18 +82,18 @@ const Register = () => {
         body: JSON.stringify(newUser)
       });
 
-      // check server response
+   
       if (!res.ok) {
         const text = await res.text().catch(() => null);
         console.error('Server returned non-OK for /users:', res.status, text);
         toast.warn('Registered but failed to save user in DB.');
-        // still navigate if you want; here we navigate but warn user
+      
         navigate(redirectTo);
         return;
       }
 
       const data = await res.json();
-      console.log('user saved to DB:', data);
+      // console.log('user saved to DB:', data);
       toast.success('Registration successful!');
       navigate(redirectTo);
     } catch (error) {

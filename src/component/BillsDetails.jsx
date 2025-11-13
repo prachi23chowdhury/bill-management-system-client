@@ -2,9 +2,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useParams, Navigate, Link } from 'react-router';
 import { AuthContext } from '../context/AuthContext';
 import PayBill from './PayBill';
+import useDocumentTitle from '../useDocomentTitle';
 
 
 export default function BillDetails() {
+   useDocumentTitle('Bill Detail | MyApp'); 
   const { user } = useContext(AuthContext); 
   const { id } = useParams(); 
   const [bill, setBill] = useState(null);

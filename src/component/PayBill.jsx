@@ -56,7 +56,7 @@ export default function PayBill({ bill }) {
     try {
       const payload = { ...formData };
       const res = await axios.post("http://localhost:3000/bills", payload);
-      console.log("Server response:", res.data);
+      // console.log("Server response:", res.data);
 
       setShowModal(false);
       setLoading(false);
